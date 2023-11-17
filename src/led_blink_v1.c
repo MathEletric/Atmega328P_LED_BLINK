@@ -1,17 +1,14 @@
 /*
-Fazer um programa que a cada toque no botão (PB4) mude o  estados de dois leds
-colocados na porta PC0 e PC1, na seguinte sequência
-▪ 1 - Led PC0 aceso
-▪ 2 - Led PC1 aceso
-▪ 3 – Led PC0 piscando em 5 Hz
-▪ 4 – Led PC0 apagado
-▪ 5 – Led PC1 piscando em 2 Hz
-▪ 6 – Leds apagados 
+Fazer um programa que a cada toque no botão (PB4) mude o estados de dois leds
+colocados na porta PC0 e PC1, na seguinte sequência:
+▪ 1  Led PC0 aceso
+▪ 2  Led PC1 aceso
+▪ 3  Led PC0 piscando em 5 Hz
+▪ 4  Led PC0 apagado
+▪ 5  Led PC1 piscando em 2 Hz
+▪ 6  Leds apagados 
 */
-
-#include<avr/io.h>
-
-#define F_CPU 1600000
+#define F_CPU 16000000
 #include <avr/io.h>
 #include <util/delay.h>
 
