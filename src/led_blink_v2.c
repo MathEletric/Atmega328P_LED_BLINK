@@ -1,79 +1,90 @@
 /*
-Fazer um programa que troque o estado do led da placa (PB5) a cada toque no 
-botão conectado ao pino PB4 (PORTB – bit 4). Você deve usar a interrupção da 
-mudança do pino para fazer a máquina de estados avançar (somar 1 na variável 
-de estado). Os estados que você deve implementar são os seguintes:
-▪ 1 Led acesso
-▪ 2 Led piscando 20 Hz
-▪ 3 Led piscando 10 Hz
-▪ 4 Led apagado
-▪ 5 Led piscando 1 H
+Fazer um programa que a cada toque no botão (PB4) mude o estados de dois leds
+colocados na porta PC0 e PC1, na seguinte sequência:
+▪ 1  Led PC0 aceso
+▪ 2  Led PC1 aceso
+▪ 3  Led PC0 piscando em 5 Hz
+▪ 4  Led PC0 apagado
+▪ 5  Led PC1 piscando em 2 Hz
+▪ 6  Leds apagados 
 */
 #define F_CPU 16000000
 #include <avr/io.h>
-#include <avr/interrupt.h>
 #include <util/delay.h>
 
-
 enum{
-	PB5_0N = 0,
-	PB5_BLINK_20HZ,
-	PB5_BLINK_10HZ,
-	PB5_OFF,
-	PB5_BLINK_1HZ
-	};
+	PC0_ON = 0,
+	PC1_ON,
+	PC0_BLINK_5HZ,
+	PC0_OFF,
+	PC1_BLINK_2HZ,
+	ALL_OFF};
 
-int state;
+int state = ALL_OFF;
 
-ISR(INT0_vect){
-	state++;
-	if(state == PB5_BLINK_1HZ+1){
-	state++;
-	}	
-}
+int main(void){
+	//CONF SAÍDAS.
+	DDRC = (DDRC | (1<<0)) | (1<<1);
 
-
-int main(){
-	//Configuração saida
-	DDRB |= (1<<5);
-	//Configuração entrada
+	//CONF ENTRADAS.
 	DDRB &= ~(1<<4);
 	PORTB |= (1<<4);
-
-	//Configuração interrupção
-	EIMSK |= (1<<0);
-	EICRA = (EICRA | (1<<1)) & ~(1<<0);
 	
-	SREG |= (1<<7);
-	
-	state = PB5_0N;
-    while (1){
+	while(1){
 		switch(state){
-			case PB5_0N:
-				PORTB |= (1<<5);
-				break;
-			case PB5_BLINK_20HZ:
+			case PC0_ON:
+				PORTC |= (1<<0);
+				if(!(PINB & (1<<4))){
+                    state =	PC1_ON;
+					while(!(PINB & (1<<4)));	
+				}
+			break;			
+			case PC1_ON:
+				PORTC |= (1<<1);
+				if(!(PINB & (1<<4))){
+                    state =	PC0_BLINK_5HZ;
+					while(!(PINB & (1<<4)));	
+				}
+			break;
+			case PC0_BLINK_5HZ:
 				while(1){
-					PORTB ^= (1<<5);
-				_delay_ms(50);
+					PORTC ^= (1<<0);
+					_delay_ms(200);
+					if(!(PINB & (1<<4))){
+						while(!(PINB & (1<<4)));
+						state =  PC0_OFF;
+						break;
+					}
+				}
+			break;
+			case PC0_OFF:
+				PORTC &= ~(1<<0);
+				if(!(PINB & (1<<4))){
+					while(!(PINB & (1<<4)));
+					state =	PC1_BLINK_2HZ;
+				}
+			break;
+			case PC1_BLINK_2HZ:
+				while(1){
+					PORTC ^= (1<<1);
+					_delay_ms(200);
+						if(!(PINB & (1<<4))){
+							while(!(PINB & (1<<4)));
+							state =  ALL_OFF;
+							break;
+						}
 				}
 				break;
-			case PB5_BLINK_10HZ:
-				while(1){
-					PORTB ^= (1<<5);
-					_delay_ms(100);
-				}	
-				break;
-			case PB5_OFF:
-				PORTB &= ~(1<<5);
-				break;
-			case PB5_BLINK_1HZ:
-				while(1){
-					PORTB ^= (1<<5);
-					_delay_ms(1000);
+			case ALL_OFF:
+				PORTC = ((PORTC & ~(1<<0)) & ~(1<<1));
+				if(!(PINB &(1<<4))){
+                    state = PC0_ON;	
+					while(!(PINB &(1<<4)));	
 				}
-				break;		
+			break;
+				
+			
+			
 		}//FIM SWITCH.
-		
-    }//FIM WHILE(1).
+	}//FIM WHILE(1).
 }//FIM MAIN.
