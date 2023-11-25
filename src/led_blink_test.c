@@ -69,8 +69,26 @@ int main(){
 }
 */
 
+/*
+//Teste simples com interrupção no PORTB
 
+ISR(PCINT0_vect){
+    PORTB ^= (1<<5);
+    _delay_ms(300);
+}
 
+int main(){
+    DDRB |= (1<<5);
+    DDRB &= ~(1<<4);
+    PORTB |= (1<<4);
+    PCICR |= (1<<0);
+    PCMSK0 |= (1<<4);
+    sei();
+    while(1){    
+    }
+}
+
+*/
 
 
 

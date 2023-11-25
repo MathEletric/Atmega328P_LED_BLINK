@@ -1,6 +1,7 @@
 PCICR – Pin Change Interrupt Control Register
 
 Bit 7:3 – Reserved
+
 Bit 2 – PCIE2: Pin Change Interrupt Enable 2 -> PCINT[23:16] / PORTD
 
 Bit 1 – PCIE1: Pin Change Interrupt Enable 1 -> PCINT[14:8] / PORTC
